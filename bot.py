@@ -1,21 +1,13 @@
 import sys
 import time
+import os
 from pathlib import Path
 from urllib.parse import urlparse
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-DEFAULT_FLAG = "CTF{DOM_CLOBBERING_FLAG_EXAMPLE}"
-
-
-def load_flag() -> str:
-    try:
-        flag_path = Path(__file__).resolve().parent / "flag.txt"
-        flag = flag_path.read_text(encoding="utf-8").strip()
-        return flag or DEFAULT_FLAG
-    except Exception:
-        return DEFAULT_FLAG
+DEFAULT_FLAG = os.environ.get("MY_FLAG", "CTF{**redected**}")
 
 
 def visit(url: str) -> None:
