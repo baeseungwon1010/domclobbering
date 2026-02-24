@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>DOM Clobbering CTF</title>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.3/dist/purify.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 30px; }
+        .box { border: 1px solid #ccc; padding: 10px; min-height: 80px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    </style>
+</head>
+<body>
+    <h1>DOM Clobbering CTF</h1>
+    <p>`?content=...` 로 내용을 전달하세요.</p>
+
+    <div class="row">
+        <div>
+            <h3>Preview</h3>
+            <div id="preview" class="box"></div>
+        </div>
+        <div>
+            <h3>Rendered</h3>
+            <div id="content" class="box"></div>
+        </div>
+    </div>
+
+    <script>
+        const usp = new URLSearchParams(window.location.search);
+        const content = decodeURIComponent(usp.get('content') || '');
+
+        const previewEl = document.getElementById('preview');
+        const outEl = document.getElementById('content');
+
+        previewEl.innerHTML = DOMPurify.sanitize(content);
+
+        const debug = !!window.debug;
+
+        fetch(`/render?content=${encodeURIComponent(content)}`)
+            .then(r => r.ok ? r.json() : Promise.reject(new Error("bad response")))
+            .then(json => {
+                const html = (json && typeof json.content === "string") ? json.content : "";
+                outEl.innerHTML = debug ? html : DOMPurify.sanitize(html);
+            })
+            .catch(() => {
+                outEl.textContent = "error";
+            });
+    </script>
+</body>
+</html>
+
