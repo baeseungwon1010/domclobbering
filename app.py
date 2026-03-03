@@ -22,6 +22,10 @@ def index():
 
 @app.route("/submit", methods=["POST"])
 def submit():
+    allowed_ips = {"127.0.0.1", "::1"}
+    remote_ip = request.remote_addr or ""
+    if remote_ip not in allowed_ips:
+        return "forbidden", 403
     user_name = request.form.get("userName", "").strip()
     random_key = request.form.get("randomKey", "").strip()
 
