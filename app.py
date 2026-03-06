@@ -33,7 +33,7 @@ def submit():
     if random_key == "100000000":
         flag = load_flag()
 
-    score = random_key or "0"
+    score = random_key
 
     # 간단한 결과 페이지
     return f"""
