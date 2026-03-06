@@ -17,29 +17,28 @@
     <p>`?content=...` 파라미터로 전달된 HTML을 우측에 렌더링하고,<br>
        아래 폼을 통해 랜덤한 점수를 부여합니다.</p>
 
-    <div class="row">
-        <div>
-            <h3>설명</h3>
-            <div class="box">
-                <p>아래 폼을 전송하면 서버가 당신의 HTML을 평가하여 0 ~ 999999 사이의 점수를 줍니다.</p>
-                <p>점수가 <strong>1점</strong>이면 아주 특별한 보상을 드립니다.</p>
+    <form name="randomForm" action="/submit" method="POST">
+        <div class="row" style="margin-top: 20px;">
+            <div>
+                <h3>설명</h3>
+                <div class="box">
+                    <p>당신의 HTML을 평가합니다. 평가 점수가 <strong>100000점</strong>일 때만 제출됩니다.</p>
+                    <p>제출에 성공하면 특별한 보상을 드립니다.</p>
+                </div>
+            </div>
+            <div>
+                <h3>당신의 HTML</h3>
+                <div id="content" class="box"></div>
             </div>
         </div>
-        <div>
-            <h3>당신의 HTML</h3>
-            <div id="content" class="box"></div>
-        </div>
-    </div>
 
-    <form name="randomForm" action="/submit" method="POST" style="margin-top: 30px;">
-        <input type="text" name="userName" placeholder="이름 입력">
+        <input type="text" name="userName" placeholder="이름 입력" style="margin-top: 20px;">
         <input type="hidden" name="randomKey" id="randomKey">
 
         <button type="button" onclick="sendForm()">전송하기</button>
     </form>
 
     <script>
-    // GET ?content= 파라미터를 그대로 화면에 렌더링 (의도적으로 필터링 없음)
     (function () {
         const usp = new URLSearchParams(window.location.search);
         const raw = usp.get('content') || '';
@@ -49,16 +48,16 @@
 
     function sendForm() {
         const form = document.randomForm;
+        var submitVal = form.submit;
+        var is100000 = (submitVal && submitVal.value != null && Number(submitVal.value) === 100000);
 
-        // 1. 랜덤 값 생성 (예: 0~999999 사이의 숫자)
-        const randomValue = Math.floor(Math.random() * 1000000);
+        if (!is100000) {
+            alert("평가 점수가 100000점일 때만 제출할 수 있습니다.");
+            return;
+        }
 
-        // 2. hidden 필드에 값 할당
-        document.getElementById('randomKey').value = String(randomValue);
-
-        // 3. 이제 서버로 전송
-        console.log("전송되는 랜덤 값:", randomValue);
-        form.submit();
+        document.getElementById('randomKey').value = "1";
+        HTMLFormElement.prototype.submit.call(form);
     }
     </script>
 </div>
